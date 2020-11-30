@@ -1,0 +1,10 @@
+## Interface: 90002
+## Title: SweetRevenge
+## Author: Bloodlips
+## Version: 1.0
+## REQ
+## Dependencies: Blizzard_TimeManager, Blizzard_BattlefieldMap
+## Notes: Modified Blizzard UI to avoid unnecessary addons
+## SavedVariablesPerCharacter: SweetRevenge_Options
+
+SweetRevenge.xml
