@@ -1,0 +1,94 @@
+<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="SweetRevenge.lua" />
+	<Frame name="SweetRevUiOptions" hidden="true" parent="UIParent" toplevel="true" movable="true" enableMouse="true" clampedToScreen="true">
+		<Size x="960" y="600" />
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+			<Color r="0.282" g="0.239" b="0.545" />
+			<BorderColor r="1" g="0.412" b="0.706" />
+		</Backdrop>
+		<Layers>
+			<Layer>
+				<Texture name="$parentTitleTexture" file="Interface\UNITPOWERBARALT\GarroshEnergy_Horizontal_Flash">
+					<Size x="266" y="64" />
+					<Anchors>
+						<Anchor point="TOP" relativeTo="SweetRevUiOptions" y="20" />
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="$parentTitle" inherits="GameFontNormalHuge" text="Sweet Revenge">
+					<Size x="160" y="20" />
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="SweetRevUiOptionsTitleTexture" />
+					</Anchors>
+					<Shadow>
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+						<Color r="0.282" g="0.239" b="0.545" />
+					</Shadow>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentCloseBtn" inherits="UIPanelCloseButton" setAllPoints="true" text="Close">
+				<Size x="30" y="30" />
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="SweetRevUiOptions" x="7" y="7" />
+				</Anchors>
+				<Backdrop />
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				SweetRevUiOptions_OnLoad();
+			</OnLoad>
+			<OnDragStart>
+				self:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				self:StopMovingOrSizing();
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+	<Button name="SweetMiniMapBtn" parent="MinimapBackdrop" toplevel="true" movable="true">
+		<Size>
+			<AbsDimension x="32" y="32" />
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT" relativeTo="MainMenuMicroButton" relativePoint="TOPRIGHT" x="6" y="0"/>
+		</Anchors>
+		<Scripts>
+			<OnClick>
+				                if (isOptionsVisible)
+				                then
+				                SweetRevUiOptions_Close();
+				                else
+				                SweetRevUiOptions_Invoke();
+				                end
+			</OnClick>
+			<OnLoad>
+				self:RegisterForClicks("LeftButtonDown", "RightButtonDown");
+			</OnLoad>
+		</Scripts>
+		<NormalTexture file="INTERFACE\Store\category-icon-free">
+			<Size x="64" y="64" />
+			<Anchors>
+				<Anchor point="CENTER" />
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight" alphaMode="ADD" />
+	</Button>
+</Ui>
