@@ -3,56 +3,8 @@
 
 SweetRev = {};
 isOptionsVisible = false; -- Window hidden to start
+SweetRev.barScale = 1;
     
-
--- Hooking Functions to Override SetPoint 
--- for each Blizzard Default UI w/ default positions (Because Refresh/Update Bars)
-
---[[
-function wait(waitTime)
-    timer = os.time()
-    repeat until os.time() > timer + waitTime
-end
-
-
-
-]]
-local function SetPointBlizzOverride(bar, ...)
-    setting = true
-    local containerScale = 0.8;
-
-
-    if bar ==  'MainMenuBar' then
-
-	  --  _G["MainMenuBar"]:SetMovable(true)  -- This is to allow next intruction "SetUserPlaced(true)"
-	  -- _G["MainMenuBar"]:SetUserPlaced(true) -- This is to keep the bar in right place (to not look like a but) https://www.wowinterface.com/forums/showthread.php?t=56369
-      --  _G["MainMenuBar"]:SetMovable(false)  -- This is to allow previous intruction only "SetUserPlaced(true)"
-		
-		-- 	_G["MainMenuBar"]:SetMovable(true)
-        -- _G["MainMenuBar"]:SetUserPlaced(true);
-        -- _G["MainMenuBar"]:SetDontSavePosition(true);
-        -- _G["MainMenuBar"].ignoreFramePositionManager = true;
-		
-		_G["MainMenuBar"]:SetScale(0.5);
-	end
-    
-    setting = nil
-end
-    
---#############################################
--- Hook to keep same positions after refresh/update (ex. bars)
- --[[ hooksecurefunc(MainMenuBar, "SetPoint", 
-					function(bar, ...)
-						if not setting then
-							bar = "MainMenuBar";
-							SetPointBlizzOverride(bar, ...)
-						end
-				end)    ]]
-	
--- Sweet Revenge (On Load Event)    
-
-
-
 
 function SweetRev:FramePositionDelegateUIParentManageFramePositions()
 -- Changed from UIParent FramePositionDelegateUIParentManageFramePositions()
@@ -187,7 +139,7 @@ function SweetRev:FramePositionDelegateUIParentManageFramePositions()
 	-- MainMenuBar
 	if not MainMenuBar:IsUserPlaced() and not MicroButtonAndBagsBar:IsUserPlaced() then
 		local screenWidth = UIParent:GetWidth();
-		local barScale = 0.9;
+		local barScale = 1; --changed by me
 		local barWidth = MainMenuBar:GetWidth();
 		local barMargin = MAIN_MENU_BAR_MARGIN;
 		local bagsWidth = MicroButtonAndBagsBar:GetWidth();
@@ -197,14 +149,14 @@ function SweetRev:FramePositionDelegateUIParentManageFramePositions()
 			barWidth = barWidth * barScale;
 			bagsWidth = bagsWidth * barScale;
 			barMargin = barMargin * barScale;
-		end
-		MainMenuBar:SetYOffset(60) -- Added
+		end 
+		MainMenuBar:SetYOffset(60) -- Added by me
 		MainMenuBar:SetScale(barScale);
 		MainMenuBar:ClearAllPoints();
 		-- if there's no overlap with between action bar and bag bar while it's in the center, use center anchor
 		local roomLeft = screenWidth - barWidth - barMargin * 2;
 		if roomLeft >= bagsWidth * 2 then
-			MainMenuBar:SetPoint("BOTTOM", UIParent, 0, MainMenuBar:GetYOffset());
+			MainMenuBar:SetPoint("BOTTOM", UIParent,"BOTTOM", 0, MainMenuBar:GetYOffset());
 		else
 			local xOffset = 0;
 			-- if both bars can fit without overlap, move the action bar to the left
@@ -214,7 +166,7 @@ function SweetRev:FramePositionDelegateUIParentManageFramePositions()
 			else
 				xOffset = math.max((roomLeft - bagsWidth) / 2 + barMargin, 0);
 			end
-			MainMenuBar:SetPoint("BOTTOMLEFT", UIParent, xOffset / barScale, MainMenuBar:GetYOffset());
+			MainMenuBar:SetPoint("BOTTOM", UIParent, 0, MainMenuBar:GetYOffset()); -- changed by me
 		end
 	end
 
@@ -373,20 +325,292 @@ function SweetRev:FramePositionDelegateUIParentManageFramePositions()
 	UpdateContainerFrameAnchors();
 end
 
-
-
  hooksecurefunc(MainMenuBar,"SetPositionForStatusBars", function()
       
-	   if ( IsPlayerInWorld() ) then
+	   --if ( IsPlayerInWorld() ) then
 			SweetRev:FramePositionDelegateUIParentManageFramePositions();
-		end
+		--end
     end)
 				
+--######################################################
+
+local function SetPointBlizzOverride(bar, ...)
+    setting = true
+    --local containerScale = 0.8;
+
+	if  bar ==  'MultiBarLeft' then 
+        _G["MultiBarLeft"]:SetWidth(500); 
+        _G["MultiBarLeft"]:SetHeight(38);
+        _G["MultiBarLeft"]:ClearAllPoints(); 
+       --* _G["MultiBarLeft"]:SetPoint("BOTTOMRIGHT",UIParent,"BOTTOM",-6, 0);
+		_G["MultiBarLeft"]:SetPoint("TOPRIGHT",MainMenuBar,"BOTTOM",18,-18.3);
+		
+		-- -25.02
+		
+		MultiBarLeftButton1:ClearAllPoints(); 
+        MultiBarLeftButton1:SetPoint("LEFT", MultiBarLeft, "LEFT", 4, -4);
+        
+        for i = 2, 12 do 
+            local n = "MultiBarLeftButton" 
+            local btn = _G[n..i]
+            btn:ClearAllPoints()
+            btn:SetPoint("LEFT", n..i - 1, "RIGHT", 6, 0)
+        end 
+		_G["MultiBarLeft"]:SetScale(SweetRev.barScale);
+        _G["MultiBarLeft"].ignoreFramePositionManager = true;
+
+    elseif  bar ==  'MultiBarRight' then 
+
+        _G["MultiBarRight"]:SetWidth(500); 
+        _G["MultiBarRight"]:SetHeight(38);
+        _G["MultiBarRight"]:ClearAllPoints(); 
+       --*  _G["MultiBarRight"]:SetPoint("TOPLEFT",MainMenuBar,"BOTTOMRIGHT");
+		_G["MultiBarRight"]:SetPoint("TOPLEFT",MainMenuBar,"BOTTOM",22.33,-18.3);
+
+        MultiBarRightButton1:ClearAllPoints(); 
+        MultiBarRightButton1:SetPoint("LEFT", MultiBarRight, "LEFT", 0, -4);
+
+        for i = 2, 12 do 
+            local n = "MultiBarRightButton" 
+            local btn = _G[n..i]
+            btn:ClearAllPoints()
+            btn:SetPoint("LEFT", n..i - 1, "RIGHT", 6, 0)
+        end 
+
+		_G["MultiBarRight"]:SetScale(SweetRev.barScale);
+        _G["MultiBarRight"].ignoreFramePositionManager = true;
+		
+		elseif  bar ==  'MainMenuBarBackpackButton' then    
+		
+			local bagscale = 0.5;
+			MicroButtonAndBagsBar:SetScale(bagscale);
+		
+			MicroButtonAndBagsBar.MicroBagBar:ClearAllPoints();
+			MicroButtonAndBagsBar.MicroBagBar:SetPoint("TOPRIGHT",CharacterMicroButton,"TOPLEFT",-4,0);
+
+			MainMenuBarBackpackButton:ClearAllPoints();
+			MainMenuBarBackpackButton:SetPoint("TOPRIGHT",MicroButtonAndBagsBar.MicroBagBar,"TOPRIGHT",-4,-4);
+		       
+    elseif  bar ==  'CharacterMicroButton' then  
+        local microBtnScale = 0.5; 
+
+		MainMenuMicroButton:SetScale(microBtnScale);
+		StoreMicroButton:SetScale(microBtnScale);
+		EJMicroButton:SetScale(microBtnScale);
+		CollectionsMicroButton:SetScale(microBtnScale);
+		LFDMicroButton:SetScale(microBtnScale);
+		GuildMicroButton:SetScale(microBtnScale);
+		QuestLogMicroButton:SetScale(microBtnScale);
+		AchievementMicroButton:SetScale(microBtnScale);
+		TalentMicroButton:SetScale(microBtnScale);
+		SpellbookMicroButton:SetScale(microBtnScale);
+		CharacterMicroButton:SetScale(microBtnScale);     
+
+    elseif bar == 'ChatFrame1EditBox' then
+        _G["ChatFrame1EditBox"]:ClearAllPoints();
+        _G["ChatFrame1EditBox"]:SetPoint("TOPLEFT",ChatFrame1,"TOPLEFT",0,0); 
+        _G["ChatFrame1EditBox"]:SetPoint("TOPRIGHT",ChatFrame1,"TOPRIGHT",0,0);
+
+    elseif  bar ==  'MinimapCluster' then
+        
+        MinimapBackdrop:ClearAllPoints();
+        MinimapBackdrop:SetPoint("RIGHT",MainMenuBar,"LEFT",-38, -18);
+        --MinimapBorder:Hide();
+
+		--[[
+        local bordersize = 5;
+        Minimap:SetMaskTexture('Interface\\Buttons\\WHITE8x8');
+        Minimap:SetBackdrop({bgFile = 'Interface\\Buttons\\WHITE8x8',
+                            edgeFile = 'Interface\\Buttons\\WHITE8x8',
+                            edgeSize = bordersize,
+                            insets = {left = bordersize
+                                     , right = bordersize
+                                    ,top = bordersize
+                                    , bottom = bordersize}}); 
+        ]]
+		--/run MinimapBackdrop:ClearAllPoints();MinimapBackdrop:SetPoint("RIGHT",MainMenuBar,"LEFT",0, 0);
+        Minimap:ClearAllPoints();
+        Minimap:SetPoint("TOP",MinimapBackdrop,"TOP",8, -2); 
+        -- Minimap:SetBackdropBorderColor(0, 0, 0, .7);
+        
+        --Minimap buttons
+        MinimapZoomOut:ClearAllPoints();
+        --MinimapZoomOut:SetPoint("BOTTOMRIGHT",Minimap,"BOTTOMLEFT",0, 0);
+		MinimapZoomOut:SetPoint("BOTTOMLEFT",MinimapBorderTop,"BOTTOMRIGHT",-2, 4);
+        MinimapZoomIn:ClearAllPoints();
+        MinimapZoomIn:SetPoint("BOTTOM",MinimapZoomOut,"TOP",0, 0); 
+
+        MiniMapTracking:ClearAllPoints();
+        -- MiniMapTracking:SetPoint("TOPRIGHT",Minimap,"TOPLEFT",0,0);
+		MiniMapTracking:SetPoint("BOTTOMLEFT",MinimapBorderTop,"TOPLEFT",20,-2); 
+        --        /run MiniMapTracking:ClearAllPoints();MiniMapTracking:SetPoint("BOTTOMLEFT",UIParent,"BOTTOMLEFT",0,0);
+	--[[		
+		if (IsAddOnLoaded("MinimapButtonBag")) then -- test if MBB addon is loaded https://www.curseforge.com/wow/addons/mbb 
+			
+			MBB_DefaultOptions = {
+				["ButtonPos"] = {0, 0},
+				["AttachToMinimap"] = 1,
+				["DetachedButtonPos"] = "CENTER",
+				["CollapseTimeout"] = 1,
+				["ExpandDirection"] = 2,
+				["MaxButtonsPerLine"] = 5,
+				["AltExpandDirection"] = 2
+			};
+			
+			MBB_Options = MBB_DefaultOptions;
+			MBB_ResetButtonPosition();
+		
+		if( MBB_Options.AttachToMinimap == 1 ) then
+				MBB_Options.AttachToMinimap = 0;
+							MBB_Options.ButtonPos = {0, 0};	--{(xpos/scale)-10, (ypos/scale)-10};
+				MBB_Options.DetachedButtonPos = MBB_DefaultOptions.DetachedButtonPos;
+				
+				MBB_MinimapButtonFrame:ClearAllPoints();
+				MBB_MinimapButtonFrame:SetPoint(MBB_Options.DetachedButtonPos, UIParent, MBB_Options.DetachedButtonPos, MBB_Options.ButtonPos[1], MBB_Options.ButtonPos[2]);
+			else
+				MBB_MinimapButtonFrame:ClearAllPoints();
+				MBB_MinimapButtonFrame:SetPoint("BOTTOMLEFT",MiniMapTracking,"TOPLEFT"); 
+			end
+			
+		end 
+			]]
+		
+        --/run Minimap:ClearAllPoints();Minimap:SetPoint("TOP",MinimapBackdrop,"TOP",8, -2); 
+        MinimapBorderTop:ClearAllPoints();
+		MinimapBorderTop:SetPoint("BOTTOMLEFT",UIParent,"BOTTOMLEFT",-20, -8); 
+		
+		MiniMapWorldMapButton:ClearAllPoints();
+		MiniMapWorldMapButton:SetPoint("BOTTOMRIGHT",MinimapBorderTop,"TOPRIGHT",0,-6); 
+		
+		MinimapZoneTextButton:ClearAllPoints();
+		MinimapZoneTextButton:SetPoint("CENTER",MinimapBorderTop,"CENTER",0,4);
+		
+        --/run MiniMapWorldMapButton:ClearAllPoints();MiniMapWorldMapButton:SetPoint("TOPRIGHT",MinimapBorderTop,"TOPRIGHT",0, 2); 
+
+        QueueStatusMinimapButton:ClearAllPoints();
+        --QueueStatusMinimapButton:SetPoint("TOPLEFT",Minimap,"TOPRIGHT",0, 0);
+        QueueStatusMinimapButton:SetPoint("BOTTOM",MiniMapTracking,"TOP"); 
+		
+		QueueStatusFrame:ClearAllPoints();
+		QueueStatusFrame:SetPoint("BOTTOMLEFT",QueueStatusMinimapButton,"TOPRIGHT",0, 0);
+		
+		--/run QueueStatusMinimapButton:ClearAllPoints();QueueStatusMinimapButton:SetPoint("LEFT",GuildInstanceDifficulty,"RIGHT",4, 0);
+        MiniMapMailFrame:ClearAllPoints();
+        --MiniMapMailFrame:SetPoint("LEFT",MiniMapTracking,"RIGHT",0, 0);
+        MiniMapMailFrame:SetPoint("TOPLEFT",Minimap,"TOPRIGHT",0, 0);
+		--/run MiniMapMailFrame:ClearAllPoints();MiniMapMailFrame:SetPoint("LEFT",QueueStatusMinimapButton,"RIGHT",0, 0);
+		
+        GameTimeFrame:SetScale(0.8);GameTimeFrame:ClearAllPoints();
+        --GameTimeFrame:SetPoint("BOTTOMLEFT",Minimap,"BOTTOMRIGHT",0, 0); 
+		GameTimeFrame:SetPoint("RIGHT",TimeManagerClockButton,"LEFT",12, 4); 
+        --        /run GameTimeFrame:SetScale(0.8);GameTimeFrame:ClearAllPoints();GameTimeFrame:SetPoint("LEFT",GarrisonLandingPageMinimapButton,"RIGHT",-2, 0); 
+        GarrisonLandingPageMinimapButton:SetScale(0.70);
+        GarrisonLandingPageMinimapButton:ClearAllPoints();
+        GarrisonLandingPageMinimapButton:SetScale(0.70);GarrisonLandingPageMinimapButton:ClearAllPoints();GarrisonLandingPageMinimapButton:SetPoint("BOTTOM",GameTimeFrame,"TOP",0, 0);
+        --        /run GarrisonLandingPageMinimapButton:SetScale(0.70);GarrisonLandingPageMinimapButton:ClearAllPoints();GarrisonLandingPageMinimapButton:SetPoint("LEFT",MiniMapMailFrame,"RIGHT",-8, 0);
+      
+        
+        MiniMapInstanceDifficulty:ClearAllPoints();
+        MiniMapInstanceDifficulty:SetPoint("TOPLEFT",ChatFrame1, "BOTTOMLEFT",0,0);
+        --/run MiniMapInstanceDifficulty:ClearAllPoints();MiniMapInstanceDifficulty:SetPoint("TOPLEFT",ChatFrame1, "BOTTOMLEFT",0,0);
+        GuildInstanceDifficulty:ClearAllPoints();
+        GuildInstanceDifficulty:SetPoint("TOPLEFT",ChatFrame1, "BOTTOMLEFT",0,0);
+        --/run GuildInstanceDifficulty:ClearAllPoints();GuildInstanceDifficulty:SetPoint("TOPLEFT",ChatFrame1, "BOTTOMLEFT",0,0);
+        MiniMapChallengeMode:ClearAllPoints();
+        MiniMapChallengeMode:SetPoint("TOPLEFT",ChatFrame1, "BOTTOMLEFT",4,-6);
+        --/run MiniMapChallengeMode:ClearAllPoints();MiniMapChallengeMode:SetPoint("TOPLEFT",ChatFrame1, "BOTTOMLEFT",4,-6);
+
+
+        Minimap:EnableMouseWheel(true)
+        Minimap:SetScript('OnMouseWheel', function(self, delta)
+            if delta > 0 then
+                Minimap_ZoomIn()
+            else
+                Minimap_ZoomOut()
+            end
+		end)
+
+	elseif  bar == 'TimeManagerClockButton' then
+
+        _G["TimeManagerClockButton"]:ClearAllPoints();
+        _G["TimeManagerClockButton"]:SetPoint("RIGHT",MiniMapWorldMapButton,"LEFT",12,0);
+
+        _G["TimeManagerFrame"]:ClearAllPoints();
+        _G["TimeManagerFrame"]:SetPoint("BOTTOM",TimeManagerClockButton,"TOP",0, 6);
+
+        _G["StopwatchFrame"]:ClearAllPoints();
+        _G["StopwatchFrame"]:SetPoint("TOP",UIParent,"TOP",0, 0);
+
+	
+	end      
+    
+    setting = nil
+end
+
+hooksecurefunc(MultiBarLeft, "SetPoint", function(bar, ...)
+	if not setting then
+		bar = "MultiBarLeft";
+		SetPointBlizzOverride(bar, ...)
+	end
+end)
+
+hooksecurefunc(MultiBarRight, "SetPoint", function(bar, ...)
+	if not setting then
+		bar = "MultiBarRight";
+		SetPointBlizzOverride(bar, ...)
+	end
+end)
+
+ hooksecurefunc(MainMenuBarBackpackButton, "SetPoint", function(bar, ...)
+        if not setting then
+            bar = "MainMenuBarBackpackButton";
+            SetPointBlizzOverride(bar, ...)
+        end
+    end)
+        
+    hooksecurefunc(CharacterMicroButton, "SetPoint", function(bar, ...)
+        if not setting then
+            bar = "CharacterMicroButton";
+            SetPointBlizzOverride(bar, ...)
+        end
+    end)
+
+hooksecurefunc(ChatFrame1EditBox, "SetPoint", function(bar, ...)
+	if not setting then
+		bar = "ChatFrame1EditBox";
+		SetPointBlizzOverride(bar, ...)
+	end
+end)
+
+hooksecurefunc(MinimapCluster, "SetPoint", function(bar, ...)
+	if not setting then
+		bar = "MinimapCluster";
+		SetPointBlizzOverride(bar, ...)
+	end
+end)
+
+hooksecurefunc(TimeManagerClockButton, "SetPoint", function(bar, ...)
+	if not setting then
+		bar = "TimeManagerClockButton";
+		SetPointBlizzOverride(bar, ...)
+	end
+end)
 
 function SweetRevUiOptions_OnLoad()
     SweetRevUiOptions:RegisterForDrag("LeftButton");
 	SweetRevUiOptions.name = "Sweet Revenge Old";
-	
+
+	print("Sweet Revenge - Addon Loaded!")
+
+	 -- SetPointBlizzOverride("MultiBarLeft"); --> For some unknow reason this is loaded automatically 
+	SetPointBlizzOverride("MultiBarRight");
+	SetPointBlizzOverride("MainMenuBarBackpackButton");
+    SetPointBlizzOverride("CharacterMicroButton");
+	SetPointBlizzOverride("ChatFrame1EditBox");
+	SetPointBlizzOverride("MinimapCluster");
+	SetPointBlizzOverride("TimeManagerClockButton");
+
+
 	--#######################################
 	-- Set Graphical settings
 --SetCVar("portal", "test");
